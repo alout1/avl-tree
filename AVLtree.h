@@ -3,9 +3,9 @@
 
 #include <iostream>
 #include <queue>
-//#include <vector>
 #include <chrono>
 #include <random>
+#include <iomanip>
 
 class Node
 {
@@ -50,8 +50,10 @@ public:
     Tree& operator|(Tree& t);    //  \/ объединение
     Tree& operator&(Tree& t);    //  /\ пересечение 
     Tree& operator/(Tree& t);    //    \  вычитание
+    
 private:
     Node* Root;
+    
     static const int MinKey = 0;
     static const int MaxKey = 100;
     static const int MaxElements = 32;
@@ -63,15 +65,12 @@ private:
     Node* rotateleft(Node* q);
     Node* findmin(Node* p);
     Node* removemin(Node* p);
+    Node* find(Node* p, int key);
     int height(Node* p);
     int bfactor(Node* p);
     void fixheight(Node* p);
-    
-    
-    
-        
-    
-    
+    void display(Node *current, int indent);
+  
 };
 
 #endif	/* AVLTREE_H */

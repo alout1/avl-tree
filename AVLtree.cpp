@@ -1,10 +1,18 @@
 #include "AVLtree.h"
 
+
 Tree::Tree()
 {
     Root = nullptr;
-    // todo: generate random tree here
-    //std::default_random_engine generator(std::chrono::system_clock::now().time_since_epoch().count());
+    std::default_random_engine generator(std::chrono::system_clock::now().time_since_epoch().count());
+    for (int i = 0; i < MaxElements; ++i)
+    {
+        int NewKey = generator() % MaxKey;
+        if (exist(MaxKey))
+            i--;
+        else
+            add(NewKey);
+    }
 }
 
 Tree::~Tree()
@@ -14,9 +22,9 @@ Tree::~Tree()
 
 Node* Tree::insert(Node* p, int k)
 {
-    if (!p)
+    if (p == nullptr)
         return new Node(k);
-    if (k < p->key)
+    else if (k < p->key)
         p->left = insert(p->left, k);
     else
         p->right = insert(p->right, k);
@@ -47,21 +55,22 @@ Node* Tree::remove(Node* p, int k) // p = root
 
 Node* Tree::balance(Node* p)
 {
+ 
     fixheight(p);
-    if (bfactor(p) == 2)
+    if( bfactor(p)==2 )
     {
-        if (bfactor(p->right) < 0)
+        if( bfactor(p->right) < 0 )
             p->right = rotateright(p->right);
         return rotateleft(p);
     }
-    else if (bfactor(p->left) == -2)
+    if( bfactor(p)==-2 )
     {
-        if (bfactor(p->left) > 0)
+        if( bfactor(p->left) > 0  )
             p->left = rotateleft(p->left);
         return rotateright(p);
     }
-    else
-        return p;
+    return p;
+
 }
 
 Node* Tree::rotateright(Node* p)
@@ -97,6 +106,18 @@ Node* Tree::removemin(Node* p)
     return balance(p);
 }
 
+Node* Tree::find(Node* p, int k)
+{
+    if (p == nullptr)
+        return nullptr;
+    else if (p->key == k)
+        return p;
+    else if (p->key < k)
+        return find(p->left, k);
+    else if (p->key > k)
+        return find(p->right, k);
+}
+
 int Tree::height(Node* p)
 {
     return p ? p->height : 0;
@@ -116,22 +137,7 @@ void Tree::fixheight(Node* p)
 
 std::ostream& operator<<(std::ostream& out, Tree& t)
 {
-    if (t.Root == nullptr)
-        return out;
-   /* std::queue<Node*> q; // обход в ширину
-    Node* x;
-    q.push(t.Root);
-    while (!q.empty())
-    {
-        x = q.front();
-        out << x << " "; 
-        q.pop();    // !!! double delete
-        if (x->left)    
-            q.push(x->left);
-        if (x->right)
-            q.push(x->right);
-    } */
-    
+    t.display(t.Root, 0);
     return out;
 }
 
@@ -165,28 +171,32 @@ Tree& Tree::operator/(Tree& t)
 
 void Tree::add(int key)
 {
-    //if (!exist(key))
+    if (!exist(key))
        Root = insert(Root, key);
 }
 
-bool Tree::exist(int k) // segfault!!
+bool Tree::exist(int key) 
 {
-    Node* p = Root;
-    while (p != nullptr && p->key != k)
-    {
-        if (p->key < k && p->left != nullptr)
-            p = p->left;
-        if (p->key > k && p->right != nullptr)
-            p = p->right;
-    }
-    if (p->key == k)
+    if (find(Root, key))
         return true;
-    else 
+    else
         return false;
 }
 
 void Tree::remove(int key)
 {
-    //if (exist(key))
+    if (exist(key))
         Root = remove(Root, key);
+}
+
+void Tree::display(Node *current, int indent)
+{
+    if (current != nullptr)
+    {
+        display(current->right, indent + 4);
+        if (indent > 0)
+            std::cout << std::setw(indent) << " ";
+        std::cout << current->key << std::endl;
+        display(current->left, indent + 4);
+    }
 }
