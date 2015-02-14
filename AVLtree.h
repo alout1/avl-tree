@@ -2,7 +2,7 @@
 #define	AVLTREE_H
 
 #include <iostream>
-#include <queue>
+#include <vector>
 #include <chrono>
 #include <random>
 #include <iomanip>
@@ -21,25 +21,14 @@ public:
         right = nullptr;
         height = 1;
     }
-    ~Node()
-    {
-        if (left)
-            delete left;
-        if (right)
-            delete right;
-    }
-    friend std::ostream& operator<<(std::ostream& out, Node& n)
-    {
-        out << n.key;
-        return out;
-    }
 };
 
 class Tree
 {
 public:
     Tree();
-    ~Tree();
+    Tree(Tree&) = delete;
+    ~Tree(); 
     
     void add(int key);
     void remove(int key);
@@ -70,7 +59,9 @@ private:
     int bfactor(Node* p);
     void fixheight(Node* p);
     void display(Node *current, int indent);
-  
+    void toVector(Node* q, std::vector<int>* v); // фугадость
+    void deleteTree(Node* q);
+
 };
 
 #endif	/* AVLTREE_H */

@@ -8,16 +8,13 @@ Tree::Tree()
     for (int i = 0; i < MaxElements; ++i)
     {
         int NewKey = generator() % MaxKey;
-        if (exist(MaxKey))
-            i--;
-        else
             add(NewKey);
     }
 }
 
 Tree::~Tree()
 {
-    delete Root;
+    deleteTree(Root);
 }
 
 Node* Tree::insert(Node* p, int k)
@@ -31,7 +28,7 @@ Node* Tree::insert(Node* p, int k)
     return balance(p);
 }
 
-Node* Tree::remove(Node* p, int k) // p = root
+Node* Tree::remove(Node* p, int k)
 {
     if (p == nullptr) 
         return p;
@@ -39,11 +36,11 @@ Node* Tree::remove(Node* p, int k) // p = root
         p->left = remove(p->left, k);
     else if (k > p->key)
         p->right = remove(p->right, k);
-    else // k == p->key
+    else 
     {
         Node* q = p->left;
         Node* r = p->right;
-        delete p;
+        delete p; 
         if (!r)
             return q;
         Node* min = findmin(r);
@@ -57,7 +54,7 @@ Node* Tree::balance(Node* p)
 {
  
     fixheight(p);
-    if( bfactor(p)==2 )
+    if( bfactor(p) == 2 )
     {
         if( bfactor(p->right) < 0 )
             p->right = rotateright(p->right);
@@ -110,11 +107,11 @@ Node* Tree::find(Node* p, int k)
 {
     if (p == nullptr)
         return nullptr;
-    else if (p->key == k)
+    if (p->key == k)
         return p;
-    else if (p->key < k)
+    if (p->key < k)
         return find(p->left, k);
-    else if (p->key > k)
+    if (p->key > k)
         return find(p->right, k);
 }
 
@@ -147,7 +144,7 @@ Tree& Tree::operator=(Tree& t)
         return *this;
     else
     {
-        delete this->Root;
+        deleteTree(this->Root);
         this->Root = t.Root;
         return *this;
     }
@@ -155,17 +152,117 @@ Tree& Tree::operator=(Tree& t)
 }
 Tree& Tree::operator&(Tree& t)
 {
+    std::vector<int> LeftTree;
+    std::vector<int> RightTree;
+    std::vector<int> Result;
+    toVector(this->Root, &LeftTree);
+    toVector(t.Root, &RightTree);
+    
+    int l = 0, r = 0;
+    while (l < LeftTree.size() && r < RightTree.size())
+    {         
+        if (RightTree[r] < LeftTree[l])
+        {r++; continue;}
+        if (RightTree[r] > LeftTree[l])
+        {l++; continue;}
+        if (RightTree[r] == LeftTree[l])
+        {
+            Result.push_back(RightTree[r]);
+            LeftTree.erase(LeftTree.begin() + l);
+            RightTree.erase(RightTree.begin() + r);
+        }
+    }
+    deleteTree(this->Root);
+    this->Root = nullptr;
+    
+    for (int i = 0; i < Result.size(); ++i)
+        this->add(Result[i]);
     
     return *this;
 }
 Tree& Tree::operator|(Tree& t)
 {
+    std::vector<int> LeftTree;
+    std::vector<int> RightTree;
+    toVector(this->Root, &LeftTree);
+    toVector(t.Root, &RightTree);
+    
+    int l = 0, r = 0;
+    while (l < LeftTree.size() && r < RightTree.size())
+    {         
+        if (RightTree[r] < LeftTree[l])
+        {r++; continue;}
+        if (RightTree[r] > LeftTree[l])
+        {l++; continue;}
+        if (RightTree[r] == LeftTree[l])
+        {
+            RightTree.erase(RightTree.begin() + r);
+        }
+    }
+    for (int i = 0; i < RightTree.size(); ++i)
+        LeftTree.push_back(RightTree[i]);
+            
+    deleteTree(this->Root);
+    this->Root = nullptr;
+    
+    for (int i = 0; i < LeftTree.size(); ++i)
+        this->add(LeftTree[i]);
     
     return *this;
 }
 Tree& Tree::operator/(Tree& t)
 {
+    std::vector<int> LeftTree;
+    std::vector<int> RightTree;
+    toVector(this->Root, &LeftTree);
+    toVector(t.Root, &RightTree);
     
+    
+    int l = 0, r = 0;
+      while (l < LeftTree.size() && r < RightTree.size())
+    { /*
+        std::cout << "l tree ";
+        for (int i = 0; i < LeftTree.size(); ++i) std::cout << LeftTree[i] << " ";
+        std::cout << "\n";
+        std::cout << "r tree ";
+        for (int i = 0; i < RightTree.size(); ++i) std::cout << RightTree[i] << " ";
+        std::cout << "\n";
+        */
+        if (RightTree[r] < LeftTree[l])
+        {r++; continue;}
+        if (RightTree[r] > LeftTree[l])
+        {l++; continue;}
+        if (RightTree[r] == LeftTree[l])
+        {
+            //std::cout << "removing " << LeftTree[l] << '\n';
+            LeftTree.erase(LeftTree.begin() + l);
+            RightTree.erase(RightTree.begin() + r);
+        }
+    }
+      /* 
+        std::cout << "\nresult:\n" << "l tree ";
+        for (int i = 0; i < LeftTree.size(); ++i) std::cout << LeftTree[i] << " ";
+        std::cout << "\n";
+        std::cout << "r tree ";
+        for (int i = 0; i < RightTree.size(); ++i) std::cout << RightTree[i] << " ";
+        std::cout << "\n";
+        */
+        
+    deleteTree(this->Root);
+    this->Root = nullptr;
+    
+    for (int i = 0; i < LeftTree.size(); ++i)
+    {
+        this->add(LeftTree[i]);
+    }
+    //for (int i = 0; i < LeftTree.size(); ++i) std::cout << "test lefttree = " << LeftTree[i] << "\n";
+    /*
+    for (int i = 0; i < RightTree.size(); ++i)
+    {
+        if (this->exist(RightTree[i]))
+        {this->remove(RightTree[i]); std::cout << "removed: " << RightTree[i] << '\n';}
+    }
+    */
     return *this;
 }
 
@@ -199,4 +296,23 @@ void Tree::display(Node *current, int indent)
         std::cout << current->key << std::endl;
         display(current->left, indent + 4);
     }
+}
+
+void Tree::toVector(Node* q, std::vector<int>* v)
+{
+    if (q->left)
+        toVector(q->left, v);
+    v->push_back(q->key);
+    if (q->right)
+        toVector(q->right, v);
+    
+}
+
+void Tree::deleteTree(Node* q)
+{
+    if (q->left)
+        deleteTree(q->left);
+    if (q->right)
+        deleteTree(q->right);
+    delete q;
 }
