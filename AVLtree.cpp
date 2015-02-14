@@ -1,6 +1,5 @@
 #include "AVLtree.h"
 
-
 Tree::Tree()
 {
     Root = nullptr;
@@ -92,12 +91,15 @@ Node* Tree::rotateleft(Node* q)
 
 Node* Tree::findmin(Node* p)
 {
-    return p->left ? findmin(p->left) : p;
+    if (p->left)
+        return findmin(p->left);
+    else
+        return p;
 }
 
 Node* Tree::removemin(Node* p)
 {
-    if (p->left == 0)
+    if (p->left == nullptr)
         return p->right;
     p->left = removemin(p->left);
     return balance(p);
@@ -117,7 +119,10 @@ Node* Tree::find(Node* p, int k)
 
 int Tree::height(Node* p)
 {
-    return p ? p->height : 0;
+    if (p != nullptr)
+        return p->height;
+    else
+        return 0;
 }
 
 int Tree::bfactor(Node* p)
@@ -129,7 +134,10 @@ void Tree::fixheight(Node* p)
 {
     int hl = height(p->left);
     int hr = height(p->right);
-    p->height = hl > hr ? hl+1 : hr+1;
+    if (hl > hr)
+        p->height = hl + 1;
+    else
+        p->height = hr + 1;
 }
 
 std::ostream& operator<<(std::ostream& out, Tree& t)
@@ -220,33 +228,17 @@ Tree& Tree::operator/(Tree& t)
     
     int l = 0, r = 0;
       while (l < LeftTree.size() && r < RightTree.size())
-    { /*
-        std::cout << "l tree ";
-        for (int i = 0; i < LeftTree.size(); ++i) std::cout << LeftTree[i] << " ";
-        std::cout << "\n";
-        std::cout << "r tree ";
-        for (int i = 0; i < RightTree.size(); ++i) std::cout << RightTree[i] << " ";
-        std::cout << "\n";
-        */
+    { 
         if (RightTree[r] < LeftTree[l])
         {r++; continue;}
         if (RightTree[r] > LeftTree[l])
         {l++; continue;}
         if (RightTree[r] == LeftTree[l])
         {
-            //std::cout << "removing " << LeftTree[l] << '\n';
             LeftTree.erase(LeftTree.begin() + l);
             RightTree.erase(RightTree.begin() + r);
         }
     }
-      /* 
-        std::cout << "\nresult:\n" << "l tree ";
-        for (int i = 0; i < LeftTree.size(); ++i) std::cout << LeftTree[i] << " ";
-        std::cout << "\n";
-        std::cout << "r tree ";
-        for (int i = 0; i < RightTree.size(); ++i) std::cout << RightTree[i] << " ";
-        std::cout << "\n";
-        */
         
     deleteTree(this->Root);
     this->Root = nullptr;
@@ -255,14 +247,6 @@ Tree& Tree::operator/(Tree& t)
     {
         this->add(LeftTree[i]);
     }
-    //for (int i = 0; i < LeftTree.size(); ++i) std::cout << "test lefttree = " << LeftTree[i] << "\n";
-    /*
-    for (int i = 0; i < RightTree.size(); ++i)
-    {
-        if (this->exist(RightTree[i]))
-        {this->remove(RightTree[i]); std::cout << "removed: " << RightTree[i] << '\n';}
-    }
-    */
     return *this;
 }
 

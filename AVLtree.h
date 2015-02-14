@@ -59,7 +59,7 @@ private:
     int bfactor(Node* p);
     void fixheight(Node* p);
     void display(Node *current, int indent);
-    void toVector(Node* q, std::vector<int>* v); // фугадость
+    void toVector(Node* q, std::vector<int>* v); 
     void deleteTree(Node* q);
 
 };
