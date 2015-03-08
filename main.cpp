@@ -2,7 +2,7 @@
 
 int main(int argc, char** argv) {
 
-    Tree a, b, c, d, e;
+    Tree a, b, c, d, e; 
     std::cout << "===================\nA:\n" << a 
         << "===================\nB:\n" << b 
         << "===================\nC:\n" << c
@@ -10,5 +10,6 @@ int main(int argc, char** argv) {
     e = a|(b&c)/d;
     std::cout << "===================\nE:\n" << e ; 
     return 0;
+ 
 }
 

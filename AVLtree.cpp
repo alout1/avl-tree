@@ -8,7 +8,7 @@ Tree::Tree()
     {
         int NewKey = generator() % MaxKey;
             add(NewKey);
-    }
+    } 
 }
 
 Tree::~Tree()
@@ -16,14 +16,14 @@ Tree::~Tree()
     deleteTree(Root);
 }
 
-Node* Tree::insert(Node* p, int k)
+Node* Tree::insert(Node* p, int k, int pos)
 {
     if (p == nullptr)
-        return new Node(k);
+        return new Node(k, pos);
     else if (k < p->key)
-        p->left = insert(p->left, k);
+        p->left = insert(p->left, k, pos);
     else
-        p->right = insert(p->right, k);
+        p->right = insert(p->right, k, pos);
     return balance(p);
 }
 
@@ -45,7 +45,11 @@ Node* Tree::remove(Node* p, int k)
         Node* min = findmin(r);
         min->right = removemin(r);
         min->left = q;
-        return balance(min);
+        
+        Node* newRoot = balance(min); //return balance(min);
+        size--;
+        // updatePositions();
+        return newRoot;
     }
 }
 
@@ -112,9 +116,9 @@ Node* Tree::find(Node* p, int k)
     if (p->key == k)
         return p;
     if (p->key < k)
-        return find(p->left, k);
+        return find(p->right, k); 
     if (p->key > k)
-        return find(p->right, k);
+        return find(p->left, k);
 }
 
 int Tree::height(Node* p)
@@ -154,6 +158,7 @@ Tree& Tree::operator=(Tree& t)
     {
         deleteTree(this->Root);
         this->Root = t.Root;
+        t.Root = nullptr;  // move, not copy
         return *this;
     }
     
@@ -253,7 +258,7 @@ Tree& Tree::operator/(Tree& t)
 void Tree::add(int key)
 {
     if (!exist(key))
-       Root = insert(Root, key);
+       Root = insert(Root, key, this->size++);
 }
 
 bool Tree::exist(int key) 
@@ -276,7 +281,12 @@ void Tree::display(Node *current, int indent)
     {
         display(current->right, indent + 4);
         if (indent > 0)
-            std::cout << std::setw(indent) << " ";
+        {   
+            //std::cout << std::setw(indent) << ".";
+            for (int i = 0; i < indent; ++i)
+                std::cout << ' ';
+            std::cout <<' ';
+        } 
         std::cout << current->key << std::endl;
         display(current->left, indent + 4);
     }
@@ -284,6 +294,11 @@ void Tree::display(Node *current, int indent)
 
 void Tree::toVector(Node* q, std::vector<int>* v)
 {
+    if (q == nullptr)
+    {
+       // std::cerr << "toVector(): recieved a nullptr!\n";
+        return;
+    }
     if (q->left)
         toVector(q->left, v);
     v->push_back(q->key);
@@ -294,6 +309,8 @@ void Tree::toVector(Node* q, std::vector<int>* v)
 
 void Tree::deleteTree(Node* q)
 {
+    if (q == nullptr)
+        return;
     if (q->left)
         deleteTree(q->left);
     if (q->right)
