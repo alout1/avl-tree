@@ -10,12 +10,14 @@
 class Node
 {
 public:
+    int position;
     int key;
     int height;
     Node* left;
     Node* right;
     Node(int k)
     {
+        //position = pos;
         key = k;
         left = nullptr;
         right = nullptr;
@@ -42,10 +44,11 @@ public:
     
 private:
     Node* Root;
+    int size = 0;
     
     static const int MinKey = 0;
     static const int MaxKey = 100;
-    static const int MaxElements = 32;
+    static const int MaxElements = 32; //32
     
     Node* insert(Node* p, int k);
     Node* remove(Node* p, int k);
@@ -61,6 +64,8 @@ private:
     void display(Node *current, int indent);
     void toVector(Node* q, std::vector<int>* v); 
     void deleteTree(Node* q);
+    
+    // merge, subst, change
 
 };
 
