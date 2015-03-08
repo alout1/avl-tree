@@ -8,7 +8,17 @@ int main(int argc, char** argv) {
         << "===================\nC:\n" << c
         << "===================\nD:\n" << d;
     e = a|(b&c)/d;
-    std::cout << "===================\nE:\n" << e ; 
+    std::cout << "===================\nE:\n" << e ;
+    
+    std::cout << "==============================================\n";
+    
+    Tree f,g; f.insert(100);g.insert(100);
+    std::cout<<f<<g;
+    std::cout>>f>>g;
+    f.merge(g);
+    std::cout>>f;
+    
+    
     return 0;
  
 }
