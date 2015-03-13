@@ -18,10 +18,10 @@ public:
     int height;
     Node* left;
     Node* right;
-    Node(int k, int pos)
+    Node(int val, int pos)
     {
         position = pos;
-        value = k;            // todo: key=>value
+        value = val;          
         left = nullptr;
         right = nullptr;
         height = 1;
@@ -136,9 +136,6 @@ private:
     
     // обход и слияние деревьев
     void merge(Node* p);
-    
-    
-
 };
 
 #endif	/* AVLTREE_H */
