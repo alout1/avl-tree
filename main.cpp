@@ -29,8 +29,8 @@ int main(int argc, char** argv) {
                 "change:\n";    
     Tree m({0,1,2,3,4,5,6,7,8,9}), n({4,3,2,1});
     std::cout  >> m >> n;
-    m.subst(k, 5);
-    std::cout << "==> " >> n;
+    m.change(n, 5);
+    std::cout << "==> " >> m;
     
     return 0;
  
