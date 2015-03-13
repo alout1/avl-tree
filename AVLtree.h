@@ -6,6 +6,7 @@
 #include <chrono>
 #include <random>
 #include <initializer_list>
+#include <assert.h>
 
 
 
@@ -13,14 +14,14 @@ class Node
 {
 public:
     int position;
-    int key;
+    int value;
     int height;
     Node* left;
     Node* right;
     Node(int k, int pos)
     {
         position = pos;
-        key = k;            // todo: key=>value
+        value = k;            // todo: key=>value
         left = nullptr;
         right = nullptr;
         height = 1;
@@ -43,12 +44,12 @@ public:
     Tree(Tree&) = delete;
      
     // простые внешние функции: вставка, удаление, проверка
-    void insertValue(int key);
-    void removeValue(int key);
-    bool existValue(int key);
+    void insertValue(int val);
+    void removeValue(int val);
+    bool existValue(int val);
     
     // вставка/удаление по позиции
-    void insertAtPosition(int key, int pos);
+    void insertAtPosition(int val, int pos);
     void removeFromPosition(int pos);
     
     // функции для последовательностей: слияние, подстановка, замена
@@ -91,11 +92,11 @@ private:
     int mode;
     
     // рабочие рекурсивные вставка/удаление в поддерево р, возвращают новый корень 
-    Node* insertValue(Node* p, int k);
-    Node* removeValue(Node* p, int k);
+    Node* insertValue(Node* p, int val);
+    Node* removeValue(Node* p, int val);
     
     // аналогично, но с позициями 
-    Node* insertAtPosition(Node* p, int key, int pos);
+    Node* insertAtPosition(Node* p, int val, int pos);
     Node* removeFromPosition(Node* p, int pos);
     
     // балансировка поддерева
@@ -110,7 +111,7 @@ private:
     Node* removeMin(Node* p);
     
     // бинарный поиск по ключу
-    Node* find(Node* p, int key);
+    Node* find(Node* p, int val);
     
     // посчитать высоту и balance factor узла
     int height(Node* p);

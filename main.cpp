@@ -1,8 +1,8 @@
 #include "AVLtree.h"
 
 int main(int argc, char** argv) {
-/*
-    Tree a, b, c, d, e; 
+
+    Tree a(32), b(32), c(32), d(32), e(32); 
     std::cout << "===================\nA:\n" << a 
         << "===================\nB:\n" << b 
         << "===================\nC:\n" << c
@@ -12,18 +12,12 @@ int main(int argc, char** argv) {
     
     std::cout << "==============================================\n";
     
-    Tree f,g; f.insert(100);g.insert(100);
-    std::cout<<f<<g;
-    std::cout>>f>>g;
-    f.merge(g);
-    std::cout>>f;
-    */
-    Tree a({0,1,2,3,4,5,6,7,8,9}), r({1,2,3,4}), b(3); 
+    
+    Tree f({0,1,2,3,4,5,6,7,8,9}), g({4,3,2,1,0}); 
 
-    a.subst(r, a.size()-1);
-    std::cout >> a;
-    a.change(r, 2);
-    std::cout >> a;
+    std::cout >> f;
+    f.change(g, 5);
+    std::cout >> f;
 
     
     

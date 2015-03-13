@@ -57,25 +57,25 @@ int Tree::size()
     return nextPosition;
 }
 
-Node* Tree::insertValue(Node* p, int k)
+Node* Tree::insertValue(Node* p, int val)
 {
     if (p == nullptr)
-        return new Node(k, nextPosition++);
-    else if (k < p->key)
-        p->left = insertValue(p->left, k);
+        return new Node(val, nextPosition++);
+    else if (val < p->value)
+        p->left = insertValue(p->left, val);
     else
-        p->right = insertValue(p->right, k);
+        p->right = insertValue(p->right, val);
     return balance(p);
 }
 
-Node* Tree::removeValue(Node* p, int k)
+Node* Tree::removeValue(Node* p, int val)
 {
     if (p == nullptr) 
         return p;
-    if (k < p->key)
-        p->left = removeValue(p->left, k);
-    else if (k > p->key)
-        p->right = removeValue(p->right, k);
+    if (val < p->value)
+        p->left = removeValue(p->left, val);
+    else if (val > p->value)
+        p->right = removeValue(p->right, val);
     else 
     {
         Node* q = p->left;
@@ -156,16 +156,18 @@ Node* Tree::removeMin(Node* p)
     return balance(p);
 }
 
-Node* Tree::find(Node* p, int k)
+Node* Tree::find(Node* p, int val)
 {
     if (p == nullptr)
         return nullptr;
-    if (p->key == k)
+    if (p->value == val)
         return p;
-    if (k < p->key)
-        return find(p->left, k); 
-    if (k > p->key)
-        return find(p->right, k);
+    if (val < p->value)
+        return find(p->left, val); 
+    if (val > p->value)
+        return find(p->right, val);
+    
+    assert(false);
 }
 
 int Tree::height(Node* p)
@@ -322,27 +324,26 @@ Tree& Tree::operator/(Tree& t)
     return *this;
 }
 
-void Tree::insertValue(int key)
+void Tree::insertValue(int val)
 {
     if (mode != VALUE)
         return;
-    if (!existValue(key))
-       root = insertValue(root, key);
-    //fixPositions();
+    if (!existValue(val))
+       root = insertValue(root, val);
 }
 
-bool Tree::existValue(int key) 
+bool Tree::existValue(int val) 
 {
-    if (find(root, key))
+    if (find(root, val))
         return true;
     else
         return false;
 }
 
-void Tree::removeValue(int key)
+void Tree::removeValue(int val)
 {
-    if (existValue(key))
-        root = removeValue(root, key);
+    if (existValue(val))
+        root = removeValue(root, val);
     nextPosition--;
 }
 
@@ -353,15 +354,14 @@ void Tree::displayTree(std::ostream& out, Node *current, int indent)
         displayTree(out, current->right, indent + 4);
         if (indent > 0)
         {   
-            //std::cout << std::setw(indent) << ".";
             for (int i = 0; i < indent; ++i)
                 out << ' ';
             out <<' ';
         } 
         if (mode == VALUE)
-            out << current->key << std::endl;
+            out << current->value << std::endl;
         else  // sequence
-            out << current->position << "(" << current->key << ")" << std::endl;
+            out << current->position << "(" << current->value << ")" << std::endl;
         displayTree(out, current->left, indent + 4);
     }
 }
@@ -372,7 +372,7 @@ void Tree::displaySequence(std::ostream& out, Node *current)
         return;
     if (current->left)
         displaySequence(out, current->left);
-    out << current->key << " " ;
+    out << current->value << " " ;
     if (current->right)
         displaySequence(out, current->right);
     
@@ -394,7 +394,7 @@ void Tree::toVector(Node* q, std::vector<int>* v)
     }
     if (q->left)
         toVector(q->left, v);
-    v->push_back(q->key);
+    v->push_back(q->value);
     if (q->right)
         toVector(q->right, v);
     
@@ -442,26 +442,26 @@ void Tree::merge(Node* p)
         return;
     if (p->left)
         merge(p->left);
-    this->root = this->insertValue(this->root, p->key); // this = lvalue tree
+    this->root = this->insertValue(this->root, p->value); // this = lvalue tree
     if (p->right)
         merge(p->right);
 }
 
-void Tree::insertAtPosition(int key, int pos)
+void Tree::insertAtPosition(int val, int pos)
 {
-    root = insertAtPosition(root, key, pos);
+    root = insertAtPosition(root, val, pos);
     nextPosition++;
     fixPositions(); 
 }
 
-Node* Tree::insertAtPosition(Node* p, int key, int pos)
+Node* Tree::insertAtPosition(Node* p, int val, int pos)
 {
     if (p == nullptr)
-        return new Node(key, nextPosition);
+        return new Node(val, nextPosition);
     else if (pos <= p->position)                        //    <=                  
-        p->left = insertAtPosition(p->left, key, pos);
+        p->left = insertAtPosition(p->left, val, pos);
     else
-        p->right = insertAtPosition(p->right, key, pos);
+        p->right = insertAtPosition(p->right, val, pos);
     return balance(p); // o_O 
 }
 
@@ -508,10 +508,10 @@ void Tree::subst(Tree& t, int pos)
 void Tree::change(Tree& t, int pos)
 {
     changeModeToSequence();
-    for (int i = pos; i < this->size(); ++i)
+    for (int i = this->size(); i >= pos; --i)
         this->removeFromPosition(i);
     std::vector<int>* v = t.toVector();
     for (int i = 0; i < t.size(); ++i)
         this->insertAtPosition(v->at(i), i + pos);
-    delete v;
+    delete v; 
 }

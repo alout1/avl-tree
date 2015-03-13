@@ -39,7 +39,6 @@
       <compileType>
         <ccTool>
           <standard>8</standard>
-          <warningLevel>3</warningLevel>
         </ccTool>
       </compileType>
       <item path="AVLtree.cpp" ex="false" tool="1" flavor2="0">
