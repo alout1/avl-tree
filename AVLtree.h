@@ -7,8 +7,7 @@
 #include <random>
 #include <initializer_list>
 #include <assert.h>
-
-
+#include <algorithm>
 
 class Node
 {
@@ -35,6 +34,8 @@ public:
     Tree(int n);
     // или список инициализации, режим sequence
     Tree(std::initializer_list<int> args);
+    
+    // стандартный деструктор не подойдет
     ~Tree();
     
     // показать размер
@@ -73,8 +74,8 @@ public:
     std::vector<int>* toVector();
     
     // переключение "режимов"
-    void changeModeToValue();
-    void changeModeToSequence();
+    void switchModeToValue();
+    void switchModeToSequence();
     
 private:
     // указатель на текущий корень дерева
@@ -133,9 +134,6 @@ private:
     // исправление значений position узлов
     void fixPositions();
     void fixPositions(Node* p);
-    
-    // обход и слияние деревьев
-    void merge(Node* p);
 };
 
 #endif	/* AVLTREE_H */

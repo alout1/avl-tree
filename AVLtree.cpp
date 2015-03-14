@@ -8,8 +8,8 @@ Tree::Tree(int n)
     std::default_random_engine generator(std::chrono::system_clock::now().time_since_epoch().count());
     for (int i = 0; i < n; ++i)
     {
-        int newKey = generator() % MAXVALUE + MINVALUE;
-        insertValue(newKey);
+        int newValue = generator() % MAXVALUE + MINVALUE;
+        insertValue(newValue);
     } 
 }
 Tree::Tree(std::initializer_list<int> args)
@@ -27,7 +27,7 @@ Tree::~Tree()
     deleteTree(root);
 }
 
-void Tree::changeModeToValue()
+void Tree::switchModeToValue()
 {
     if (mode == VALUE)
         return;
@@ -37,9 +37,9 @@ void Tree::changeModeToValue()
     root = nullptr;
     for (int i = 0; i < v->size(); ++i)
         insertValue(v->at(i));
-    
+    delete v;
 }
-void Tree::changeModeToSequence()
+void Tree::switchModeToSequence()
 {
     if (mode == SEQUENCE)
         return;
@@ -49,7 +49,7 @@ void Tree::changeModeToSequence()
     root = nullptr;
     for (int i = 0; i < v->size(); ++i)
         insertAtPosition(v->at(i), this->size());
-    
+    delete v;
 }
 
 int Tree::size()
@@ -81,7 +81,7 @@ Node* Tree::removeValue(Node* p, int val)
         Node* q = p->left;
         Node* r = p->right;
         delete p; 
-        if (!r)
+        if (r == nullptr)
             return q;
         Node* min = findMin(r);
         min->right = removeMin(r);
@@ -165,8 +165,7 @@ Node* Tree::find(Node* p, int val)
     if (val < p->value)
         return find(p->left, val); 
     if (val > p->value)
-        return find(p->right, val);
-    
+        return find(p->right, val); 
     assert(false);
 }
 
@@ -215,101 +214,100 @@ Tree& Tree::operator=(Tree& t)
         deleteTree(this->root);
         this->root = t.root;
         this->nextPosition = t.nextPosition;
-        t.root = nullptr;  // move
+        t.root = nullptr;  // крадем дерево!
         return *this;
     }
     
 }
 Tree& Tree::operator&(Tree& t)
 {
+    this->switchModeToValue();
+    t.switchModeToValue();
     
-    this->changeModeToValue();
-    t.changeModeToValue();
-    
-    std::vector<int> LeftTree;
-    std::vector<int> RightTree;
-    std::vector<int> Result;
-    toVector(this->root, &LeftTree);
-    toVector(t.root, &RightTree);
+    std::vector<int> leftOperand;
+    std::vector<int> rightOperand;
+    std::vector<int> result;
+    toVector(this->root, &leftOperand); 
+    toVector(t.root, &rightOperand);
     
     int l = 0, r = 0;
-    while (l < LeftTree.size() && r < RightTree.size())
+    while (l < leftOperand.size() && r < rightOperand.size())
     {         
-        if (RightTree[r] < LeftTree[l])
+        if (rightOperand[r] < leftOperand[l])
         {r++; continue;}
-        if (RightTree[r] > LeftTree[l])
+        if (rightOperand[r] > leftOperand[l])
         {l++; continue;}
-        if (RightTree[r] == LeftTree[l])
+        if (rightOperand[r] == leftOperand[l])
         {
-            Result.push_back(RightTree[r]);
-            LeftTree.erase(LeftTree.begin() + l);
-            RightTree.erase(RightTree.begin() + r);
+            result.push_back(rightOperand[r]);
+            leftOperand.erase(leftOperand.begin() + l);
+            rightOperand.erase(rightOperand.begin() + r);
         }
     }
     deleteTree(this->root);
-    this->nextPosition = 0;
-    this->root = nullptr;
+    nextPosition = 0;
+    root = nullptr;
     
-    for (int i = 0; i < Result.size(); ++i)
-        this->insertValue(Result[i]);
+    for (int i = 0; i < result.size(); ++i)
+        this->insertValue(result[i]);
     
     return *this;
 }
 Tree& Tree::operator|(Tree& t)
 {
-    this->changeModeToValue();
-    t.changeModeToValue();
+    this->switchModeToValue();
+    t.switchModeToValue();
     
-    std::vector<int> LeftTree;
-    std::vector<int> RightTree;
-    toVector(this->root, &LeftTree);
-    toVector(t.root, &RightTree);
+    std::vector<int> leftOperand;
+    std::vector<int> rightOrerand;
+    toVector(this->root, &leftOperand);
+    toVector(t.root, &rightOrerand);
     
     int l = 0, r = 0;
-    while (l < LeftTree.size() && r < RightTree.size())
+    while (l < leftOperand.size() && r < rightOrerand.size())
     {         
-        if (RightTree[r] < LeftTree[l])
+        if (rightOrerand[r] < leftOperand[l])
         {r++; continue;}
-        if (RightTree[r] > LeftTree[l])
+        if (rightOrerand[r] > leftOperand[l])
         {l++; continue;}
-        if (RightTree[r] == LeftTree[l])
+        if (rightOrerand[r] == leftOperand[l])
         {
-            RightTree.erase(RightTree.begin() + r);
+            rightOrerand.erase(rightOrerand.begin() + r);
         }
     }
-    for (int i = 0; i < RightTree.size(); ++i)
-        LeftTree.push_back(RightTree[i]);
+    for (int i = 0; i < rightOrerand.size(); ++i)
+        leftOperand.push_back(rightOrerand[i]);
             
     deleteTree(this->root);
     this->nextPosition = 0;
     this->root = nullptr;
     
-    for (int i = 0; i < LeftTree.size(); ++i)
-        this->insertValue(LeftTree[i]);
+    for (int i = 0; i < leftOperand.size(); ++i)
+        this->insertValue(leftOperand[i]);
     
     return *this;
 }
 Tree& Tree::operator/(Tree& t)
 {
-    this->changeModeToValue();
-    t.changeModeToValue();
+    this->switchModeToValue();
+    t.switchModeToValue();
     
-    std::vector<int> LeftTree;
-    std::vector<int> RightTree;
-    toVector(this->root, &LeftTree);
-    toVector(t.root, &RightTree);
+    std::vector<int> leftTree;
+    std::vector<int> rightTree;
+    toVector(this->root, &leftTree);
+    toVector(t.root, &rightTree);
     
     int l = 0, r = 0;
-    while (l < LeftTree.size() && r < RightTree.size())
+    while (l < leftTree.size() && r < rightTree.size())
     { 
-        if (RightTree[r] < LeftTree[l])
+        if (rightTree[r] < leftTree[l])
         {r++; continue;}
-        if (RightTree[r] > LeftTree[l])
+        if (rightTree[r] > leftTree[l])
         {l++; continue;}
-        if (RightTree[r] == LeftTree[l])
+        if (rightTree[r] == leftTree[l])
         {
-            LeftTree.erase(LeftTree.begin() + l);
-            RightTree.erase(RightTree.begin() + r);
+            leftTree.erase(leftTree.begin() + l);
+            rightTree.erase(rightTree.begin() + r);
         }
     }
         
@@ -317,9 +315,9 @@ Tree& Tree::operator/(Tree& t)
     this->nextPosition = 0;
     this->root = nullptr;
     
-    for (int i = 0; i < LeftTree.size(); ++i)
+    for (int i = 0; i < leftTree.size(); ++i)
     {
-        this->insertValue(LeftTree[i]);
+        this->insertValue(leftTree[i]);
     }
     return *this;
 }
@@ -334,6 +332,7 @@ void Tree::insertValue(int val)
 
 bool Tree::existValue(int val) 
 {
+    // assert(mode == VALUE);
     if (find(root, val))
         return true;
     else
@@ -342,6 +341,8 @@ bool Tree::existValue(int val)
 
 void Tree::removeValue(int val)
 {
+    if (mode != VALUE)
+        return;
     if (existValue(val))
         root = removeValue(root, val);
     nextPosition--;
@@ -374,9 +375,7 @@ void Tree::displaySequence(std::ostream& out, Node *current)
         displaySequence(out, current->left);
     out << current->value << " " ;
     if (current->right)
-        displaySequence(out, current->right);
-    
-    
+        displaySequence(out, current->right);   
 }
 std::vector<int>* Tree::toVector()
 {
@@ -388,16 +387,12 @@ std::vector<int>* Tree::toVector()
 void Tree::toVector(Node* q, std::vector<int>* v)
 {
     if (q == nullptr)
-    {
-       // std::cerr << "toVector(): recieved a nullptr!\n";
         return;
-    }
     if (q->left)
         toVector(q->left, v);
     v->push_back(q->value);
     if (q->right)
         toVector(q->right, v);
-    
 }
 
 void Tree::deleteTree(Node* q)
@@ -426,25 +421,6 @@ void Tree::fixPositions(Node* p)
     p->position = nextPosition++;
     if (p->right)
         fixPositions(p->right);   
-    
-}
-
-void Tree::merge(Tree& t) // O(n*log(n))
-{
-    changeModeToValue();
-    merge(t.root);
-    fixPositions();
-}
-
-void Tree::merge(Node* p)
-{
-    if(p == nullptr)
-        return;
-    if (p->left)
-        merge(p->left);
-    this->root = this->insertValue(this->root, p->value); // this = lvalue tree
-    if (p->right)
-        merge(p->right);
 }
 
 void Tree::insertAtPosition(int val, int pos)
@@ -458,11 +434,11 @@ Node* Tree::insertAtPosition(Node* p, int val, int pos)
 {
     if (p == nullptr)
         return new Node(val, nextPosition);
-    else if (pos <= p->position)                        //    <=                  
+    else if (pos <= p->position)                // при совпадении позиций вставка влево --  <=                  
         p->left = insertAtPosition(p->left, val, pos);
     else
         p->right = insertAtPosition(p->right, val, pos);
-    return balance(p); // o_O 
+    return balance(p); 
 }
 
 void Tree::removeFromPosition(int pos)
@@ -485,7 +461,7 @@ Node* Tree::removeFromPosition(Node* p, int pos)
         Node* q = p->left;
         Node* r = p->right;
         delete p; 
-        if (r == nullptr) // !r
+        if (r == nullptr) 
             return q;
         Node* min = findMin(r);
         min->right = removeMin(r);
@@ -496,22 +472,48 @@ Node* Tree::removeFromPosition(Node* p, int pos)
     return balance(p);
 }
 
-void Tree::subst(Tree& t, int pos)
+void Tree::merge(Tree& t) // O(n^2)
 {
-    changeModeToSequence();
+    switchModeToSequence();
+    
+    std::vector<int>* q = this->toVector();
+    std::vector<int>* p = t.toVector();
+    std::vector<int> result;
+    result.resize(this->size() + t.size());
+    std::vector<int>::iterator it;   
+    
+    // http://www.cplusplus.com/reference/algorithm/sort/
+    //http://www.cplusplus.com/reference/algorithm/merge/
+    std::sort(p->begin(), p->end());                                         // n*log(n)
+    std::sort(q->begin(), q->end());
+    std::merge(p->begin(), p->end(), q->begin(), q->end(), result.begin());  // n
+    
+    deleteTree(root);
+    root = nullptr;
+    nextPosition = 0;
+    for (it = result.begin(); it != result.end(); ++it)    // n
+        insertAtPosition(*it, nextPosition);                // n^2
+    
+    delete p;
+    delete q;   
+}
+
+void Tree::subst(Tree& t, int pos) // O(n^2)
+{
+    switchModeToSequence();                //n* log(n))
     std::vector<int>* v = t.toVector();
-    for (int i = 0; i < t.size(); ++i)
-        insertAtPosition(v->at(i), pos + i);
+    for (int i = 0; i < t.size(); ++i)        // n
+        insertAtPosition(v->at(i), pos + i);  // *n = n^2
     delete v;
 }
 
-void Tree::change(Tree& t, int pos)
+void Tree::change(Tree& t, int pos) // O(n^2)
 {
-    changeModeToSequence();
-    for (int i = this->size(); i >= pos; --i)
-        this->removeFromPosition(i);
+    switchModeToSequence();
+    for (int i = this->size(); i >= pos; --i)   // n
+        this->removeFromPosition(i);            // *n = n^2
     std::vector<int>* v = t.toVector();
     for (int i = 0; i < t.size(); ++i)
-        this->insertAtPosition(v->at(i), i + pos);
+        this->insertAtPosition(v->at(i), i + pos);  // n^2
     delete v; 
 }
