@@ -500,7 +500,7 @@ void Tree::merge(Tree& t) // O(n^2)
 
 void Tree::subst(Tree& t, int pos) // O(n^2)
 {
-    switchModeToSequence();                //n* log(n))
+    switchModeToSequence();                
     std::vector<int>* v = t.toVector();
     for (int i = 0; i < t.size(); ++i)        // n
         insertAtPosition(v->at(i), pos + i);  // *n = n^2
