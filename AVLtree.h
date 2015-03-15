@@ -79,7 +79,7 @@ public:
     
 private:
     // указатель на текущий корень дерева
-    Node* root;
+    Node* root; 
     
     // количество элементов
     int nextPosition = 0;
@@ -111,7 +111,7 @@ private:
     Node* findMin(Node* p);
     Node* removeMin(Node* p);
     
-    // бинарный поиск по ключу
+    // бинарный поиск по ключу и позиции
     Node* find(Node* p, int val);
     
     // посчитать высоту и balance factor узла

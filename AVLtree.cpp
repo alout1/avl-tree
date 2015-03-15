@@ -65,7 +65,9 @@ Node* Tree::insertValue(Node* p, int val)
         p->left = insertValue(p->left, val);
     else
         p->right = insertValue(p->right, val);
-    return balance(p);
+    //return balance(p);
+    Node* x = balance(p);
+    return x;
 }
 
 Node* Tree::removeValue(Node* p, int val)
@@ -166,7 +168,7 @@ Node* Tree::find(Node* p, int val)
         return find(p->left, val); 
     if (val > p->value)
         return find(p->right, val); 
-    assert(false);
+    //assert(false);
 }
 
 int Tree::height(Node* p)
@@ -488,7 +490,7 @@ void Tree::merge(Tree& t) // O(n^2)
     std::sort(q->begin(), q->end());
     std::merge(p->begin(), p->end(), q->begin(), q->end(), result.begin());  // n
     
-    deleteTree(root);
+    deleteTree(this->root);
     root = nullptr;
     nextPosition = 0;
     for (it = result.begin(); it != result.end(); ++it)    // n
@@ -510,10 +512,27 @@ void Tree::subst(Tree& t, int pos) // O(n^2)
 void Tree::change(Tree& t, int pos) // O(n^2)
 {
     switchModeToSequence();
-    for (int i = this->size(); i >= pos; --i)   // n
-        this->removeFromPosition(i);            // *n = n^2
-    std::vector<int>* v = t.toVector();
-    for (int i = 0; i < t.size(); ++i)
-        this->insertAtPosition(v->at(i), i + pos);  // n^2
-    delete v; 
+    std::vector<int>* l = this->toVector();
+    std::vector<int>* r = t.toVector();
+    
+    if (pos > l->size())
+        pos = l->size();    // если задана слишком большая позиция, просто вставка в конец
+    
+    if (l->size() < r->size() + pos)
+        l->resize(pos + r->size()); // если правая не помещается в левую, увеличить левую
+    
+    int i, k;
+    for (i = pos, k = 0; k < r->size(); ++i, ++k)   // выполнение change() на векторах)
+    {
+        (*l)[i] = (*r)[k];
+    }
+    
+    deleteTree(this->root);         // пересборка дерева(this) из левого вектора(l)
+    root = nullptr;
+    nextPosition = 0;
+    for (int i = 0; i < l->size(); ++i)        
+        insertAtPosition(l->at(i), i);  
+    
+    delete r;
+    delete l;   
 }
