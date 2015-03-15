@@ -12,6 +12,14 @@ int main(int argc, char** argv) {
     
         
     e.switchModeToSequence();
+    std::cout << "==============================================\n" >> e <<
+                "change:\n";    
+    Tree  n({4,3,2,1});
+    std::cout >> n;
+    e.change(n, 10);
+    std::cout << "==> " >> e;
+  
+  
     std::cout << "==============================================\n" <<
                 "merge:\n";    
     Tree f({0,0,0,1,1,1,97,98,99}); 
@@ -26,14 +34,7 @@ int main(int argc, char** argv) {
     e.subst(h, 6);
     std::cout << "==> " >> e;
     
-    std::cout << "==============================================\n" <<
-                "change:\n";    
-    Tree  n({4,3,2,1});
-    std::cout >> n;
-    e.change(n, 10);
-    std::cout << "==> " >> e;
     
-    return 0;
- 
+   return 0;
 }
 
